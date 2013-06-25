@@ -1,0 +1,821 @@
+;---Left Arm: 900-999---
+
+;Var(0):Override.
+;Var(1): Attack Successful
+;Var(2): Unguardable
+
+[Statedef 900]
+type = S
+ctrl = 1
+velset = 0,0
+
+[State 900, ch]
+type=ParentVarSet
+trigger1=var(2)=42
+var(9)=4200
+
+[State 900, ch]
+type=varset
+trigger1=var(2)!=0
+var(2)=0
+
+[State 900, turn]
+type=turn
+trigger1=facing!=parent,var(7)&&parent,var(7)!=0
+
+[State 900, BackFromSuperArmor]
+type = ChangeAnim
+trigger1 = !Time
+trigger1 = PrevStateNo != 999
+value = 1010
+
+[State 900,Pos]
+type=PosSet
+trigger1=1
+ignorehitpause=1
+x=(parent,pos x)+(-54*TeamSide+81)
+y=(parent,pos y)-78
+
+[State 900, HitOver]
+type = HitOverride
+trigger1= 1
+time = -1
+attr = SCA, AA, AP
+stateno = 999
+
+[State 900, HitOver]
+type = NotHitBy
+trigger1= 1
+time = 1
+value= , AT
+ignorehitpause=1
+
+[State 900, VarSet]
+type = VarSet
+trigger1= StateNo!=199
+var(0) = StateNo
+
+[State 900, pos]
+type=PosFreeze
+trigger1=1
+ignorehitpause=1
+
+[State 900, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 900, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoStandGuard
+flag2 = NoCrouchGuard
+flag3 = NoAirGuard
+
+[State 900, pos]
+type=Sprpriority
+trigger1=1
+value=0
+
+[State 900, pos]
+type=ScreenBound
+trigger1=1
+ignorehitpause=1
+value=0
+
+[State 900, Destroy Left Arm]
+type=Changestate
+trigger1=parent,var(4)<0
+value=998
+
+[State 900,Intro]
+type=changestate
+trigger1=root,stateno=190
+value=990
+
+[State 900, Span Death]
+type=ChangeState
+trigger1=root,stateno=305&&root, time>5&&root, numexplod(2550)=0
+value=905
+
+[State 900, Freeze]
+type=ChangeState
+trigger1=root,stateno=304&&root, time>5&&root, numexplod(2530)=0
+value=904
+
+[State 900, Hurricane]
+type=ChangeState
+trigger1=root,stateno=301
+value=901
+
+[State 900, Protective Seal]
+type=ChangeState
+trigger1=root,stateno=302
+value=902
+
+[State 900, Laser beams - Doors of Doom open.]
+type=ChangeState
+trigger1=root,Stateno=220
+value=920
+
+;---Hurricane Attack---
+
+[Statedef 901]
+type = S
+ctrl = 1
+velset = 0,0
+
+[State 901,var]
+type=varset
+trigger1=!time
+trigger1 = PrevStateNo != 999
+var(1)=0
+
+[State 901, Helper1]
+type=Helper
+trigger1=anim=1011&&animelemtime(3)=10&&!var(1)
+name="Hurricane 1"
+ID=2000
+pos=15,55
+postype=p1
+stateno=2000
+ownpal=1
+persistent=0
+
+[State 901, Helper2]
+type=Helper
+trigger1=anim=1011&&animelemtime(3)=10&&!var(1)
+name="Hurricane 2"
+ID=2000
+pos=15,55
+postype=p1
+stateno=2000
+ownpal=1
+persistent=0
+
+[State 801,var]
+type=varset
+trigger1=anim=1011&&animelemtime(3)=10
+var(1)=1
+
+[State 901, turn]
+type=turn
+trigger1=facing!=parent,var(7)&&parent,var(7)!=0
+
+[State 901, BackFromSuperArmor]
+type = ChangeAnim
+trigger1 = !Time
+trigger1 = PrevStateNo != 999
+value = 1011
+
+[State 901,Pos]
+type=PosSet
+trigger1=1
+ignorehitpause=1
+x=(parent,pos x)+(-54*TeamSide+81)
+y=(parent,pos y)-78
+
+[State 901, pos]
+type=PosFreeze
+trigger1=1
+ignorehitpause=1
+
+[State 901, HitOver]
+type = HitOverride
+trigger1= 1
+time = -1
+attr = SCA, AA, AP
+stateno = 999
+
+[State 901, HitOver]
+type = NotHitBy
+trigger1= 1
+time = 1
+value= , AT
+ignorehitpause=1
+
+[State 901, VarSet]
+type = VarSet
+trigger1= StateNo!=199
+var(0) = StateNo
+
+[State 901, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 901, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoStandGuard
+flag2 = NoCrouchGuard
+flag3 = NoAirGuard
+
+[State 901, pos]
+type=Sprpriority
+trigger1=1
+value=0
+
+[State 901, pos]
+type=ScreenBound
+trigger1=1
+ignorehitpause=1
+value=0
+
+[State 901, Back]
+type=ChangeState
+trigger1=Animtime=0
+value=900
+
+;---Protective Seal---
+
+[Statedef 902]
+type = S
+ctrl = 1
+velset = 0,0
+
+[State 902,var]
+type=varset
+trigger1=!time
+trigger1 = PrevStateNo != 999
+var(1)=0
+
+[State 902,var]
+type=varset
+trigger1=root,numHelper(2009)
+var(1)=1
+
+[State 902, turn]
+type=turn
+trigger1=facing!=parent,var(7)&&parent,var(7)!=0
+
+[State 902, BackFromSuperArmor]
+type = ChangeAnim
+trigger1 = !Time
+trigger1 = PrevStateNo != 999
+value = 1012
+
+[State 902,Pos]
+type=PosSet
+trigger1=1
+ignorehitpause=1
+x=(parent,pos x)+(-54*TeamSide+81)
+y=(parent,pos y)-78
+
+[State 902, pos]
+type=PosFreeze
+trigger1=1
+ignorehitpause=1
+
+[State 902, HitOver]
+type = HitOverride
+trigger1= 1
+time = -1
+attr = SCA, AA, AP
+stateno = 999
+
+[State 902, HitOver]
+type = NotHitBy
+trigger1= 1
+time = 1
+value= , AT
+ignorehitpause=1
+
+[State 902, VarSet]
+type = VarSet
+trigger1= 1
+var(0) = StateNo
+
+[State 902, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 902, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoStandGuard
+flag2 = NoCrouchGuard
+flag3 = NoAirGuard
+
+[State 902, pos]
+type=Sprpriority
+trigger1=1
+value=0
+
+[State 902, pos]
+type=ScreenBound
+trigger1=1
+ignorehitpause=1
+value=0
+
+[State 902, Back]
+type=ChangeState
+trigger1=Animtime=0
+value=900
+
+;---Freeze - Stop---
+
+[Statedef 904]
+type = S
+ctrl = 1
+velset = 0,0
+
+[State 904, BackFromSuperArmor]
+type = ChangeAnim
+trigger1 = !Time
+trigger1 = PrevStateNo != 999
+value = 1014
+
+[State 904,var]
+type=varset
+trigger1=!time
+trigger1 = PrevStateNo != 999
+var(1)=0
+
+[State 904,var]
+type=varset
+trigger1=anim=1014&&(root,numHelper(2040))
+var(1)=1
+
+[State 904, turn]
+type=turn
+trigger1=facing!=parent,var(7)&&parent,var(7)!=0
+
+[State 904,Pos]
+type=PosSet
+trigger1=1
+ignorehitpause=1
+x=(parent,pos x)+(-54*TeamSide+81)
+y=(parent,pos y)-78
+
+[State 904, HitOver]
+type = HitOverride
+trigger1= 1
+time = -1
+attr = SCA, AA, AP
+stateno = 999
+
+[State 904, HitOver]
+type = NotHitBy
+trigger1= 1
+time = 1
+value= , AT
+ignorehitpause=1
+
+[State 904, VarSet]
+type = VarSet
+trigger1= StateNo!=199
+var(0) = StateNo
+
+[State 904, pos]
+type=PosFreeze
+trigger1=1
+ignorehitpause=1
+
+[State 904, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 904, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoStandGuard
+flag2 = NoCrouchGuard
+flag3 = NoAirGuard
+
+[State 904, pos]
+type=Sprpriority
+trigger1=1
+value=0
+
+[State 904, pos]
+type=ScreenBound
+trigger1=1
+ignorehitpause=1
+value=0
+
+[State 904, Back]
+type=ChangeState
+trigger1=animtime=0
+value=900
+
+;---Span Death---
+
+[Statedef 905]
+type = S
+ctrl = 1
+velset = 0,0
+
+[State 905, VarSet]
+type = VarSet
+trigger1= !time
+var(0) = StateNo
+
+[State 905, BackFromSuperArmor]
+type = ChangeAnim
+trigger1 = !Time
+trigger1 = PrevStateNo != 999
+value = 1015
+
+[State 905, turn]
+type=turn
+trigger1=facing!=parent,var(7)&&parent,var(7)!=0
+
+[State 905,var]
+type=varset
+trigger1=!time
+trigger1 = PrevStateNo != 999
+var(1)=0
+
+[State 905, Shiny!]
+type=Explod
+trigger1=NumExplod(2050)<10&&animelemtime(5)<0&&animelemtime(4)>=0
+anim=2050
+ID=2050
+postype=p1
+pos=-30,0
+bindtime=1
+vel=0,0.1
+random=70,70
+removetime=64
+sprpriority=3
+ownpal=1
+
+[State 260, snd]
+type=PlaySnd
+trigger1=animelemtime(5)<0&&animelemtime(4)>=0
+channel=0
+lowpriority =1
+value=1,3
+
+[State 905, LifeBack]
+type=ParentVarAdd
+trigger1=animelemtime(15)=0&&parent,var(8)<1845&&!var(1)
+v=8
+value=155
+
+[State 905, LifeBack]
+type=ParentVarSet
+trigger1=animelemtime(15)=0&&parent,var(8)>=1845&&!var(1)
+v=8
+value=2000
+
+[State 905,var]
+type=varset
+trigger1=animelemtime(15)=0
+var(1)=1
+
+[State 905,Pos]
+type=PosSet
+trigger1=1
+ignorehitpause=1
+x=(parent,pos x)+(-54*TeamSide+81)
+y=(parent,pos y)-78
+
+[State 905, HitOver]
+type = HitOverride
+trigger1= 1
+time = -1
+attr = SCA, AA, AP
+stateno = 999
+
+[State 905, HitOver]
+type = NotHitBy
+trigger1= 1
+time = 1
+value= , AT
+ignorehitpause=1
+
+[State 905, pos]
+type=PosFreeze
+trigger1=1
+ignorehitpause=1
+
+[State 905, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 905, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoStandGuard
+flag2 = NoCrouchGuard
+flag3 = NoAirGuard
+
+[State 905, pos]
+type=Sprpriority
+trigger1=1
+value=0
+
+[State 905, pos]
+type=ScreenBound
+trigger1=1
+ignorehitpause=1
+value=0
+
+[State 905, Back]
+type=ChangeState
+trigger1=animtime=0
+value=900
+
+;---Laser beams - Doors of Doom open---
+
+[Statedef 920]
+type = S
+ctrl = 1
+velset = 0,0
+
+[State 920, Back]
+type=ChangeState
+trigger1=root,var(1)
+value=900
+
+[State 920, turn]
+type=turn
+trigger1=facing!=parent,var(7)&&parent,var(7)!=0
+
+[State 920, BackFromSuperArmor]
+type = ChangeAnim
+trigger1 = !Time
+trigger1 = PrevStateNo != 999
+value = 1020
+
+[State 920,Pos]
+type=PosSet
+trigger1=1
+ignorehitpause=1
+x=(parent,pos x)+(-54*TeamSide+81)
+y=(parent,pos y)-78
+
+[State 920, HitOver]
+type = HitOverride
+trigger1= 1
+time = -1
+attr = SCA, AA, AP
+stateno = 999
+
+[State 920, HitOver]
+type = NotHitBy
+trigger1= 1
+time = 1
+value= , AT
+ignorehitpause=1
+
+[State 920, VarSet]
+type = VarSet
+trigger1= StateNo!=199
+var(0) = StateNo
+
+[State 920, pos]
+type=PosFreeze
+trigger1=1
+ignorehitpause=1
+
+[State 920, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 920, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoStandGuard
+flag2 = NoCrouchGuard
+flag3 = NoAirGuard
+
+[State 920, pos]
+type=Sprpriority
+trigger1=1
+value=0
+
+[State 920, pos]
+type=ScreenBound
+trigger1=1
+ignorehitpause=1
+value=0
+
+[State 920, Back]
+type=ChangeState
+trigger1=Animtime=0||root,stateno!=220
+value=900
+
+;---Intro---
+[Statedef 990]
+movetype=H
+ctrl=0
+anim=1009
+velset=0,0
+
+[State 920,Pos]
+type=PosSet
+trigger1=1
+ignorehitpause=1
+x=(parent,pos x)+(-54*TeamSide+81)
+y=(parent,pos y)-78
+
+[State 920, HitOver]
+type = HitOverride
+trigger1= 1
+time = -1
+attr = SCA, AA, AP
+stateno = 999
+
+[State 920, HitOver]
+type = NotHitBy
+trigger1= 1
+time = 1
+value= , AT
+ignorehitpause=1
+
+[State 920, VarSet]
+type = VarSet
+trigger1= StateNo!=199
+var(0) = StateNo
+
+[State 920, pos]
+type=PosFreeze
+trigger1=1
+ignorehitpause=1
+
+[State 920, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 920, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoStandGuard
+flag2 = NoCrouchGuard
+flag3 = NoAirGuard
+
+[State 920, pos]
+type=Sprpriority
+trigger1=1
+value=0
+
+[State 920, pos]
+type=ScreenBound
+trigger1=1
+ignorehitpause=1
+value=0
+
+[State 990,change]
+type=changestate
+value=900
+trigger1=root,stateno!=190
+
+
+;---Destroying the Arm---
+[Statedef 998]
+movetype=H
+ctrl=0
+velset=0,0
+
+[State 998, snd]
+type=PlaySnd
+trigger1=!time
+channel=0
+value=0,2
+
+[State 998, turn]
+type=turn
+trigger1=facing!=parent,var(7)&&parent,var(7)!=0
+
+[State 998, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 998, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoStandGuard
+flag2 = NoCrouchGuard
+flag3 = NoAirGuard
+
+[State 998,Pos]
+type=PosSet
+trigger1=1
+ignorehitpause=1
+x=(parent,pos x)+(-54*TeamSide+81)
+y=(parent,pos y)-78
+
+[State 998, NotHitBy]
+type = NotHitBy
+trigger1 = 1
+value = SCA, AA, AT, AP
+time = 1
+
+[State 998, fade]
+type=trans
+trigger1 = time < 64
+trans = addalpha
+alpha = 256-time*4, time*4
+
+[State 998,vars]
+type=parentvarset
+trigger1=!time
+v=2
+value=1
+
+[State 998,Destroy]
+type=Destroyself
+trigger1=time>=64
+
+;---HitOverride :P---
+[Statedef 999]
+velset=0,0
+Movetype=H
+
+[State 999, turn]
+type=turn
+trigger1=facing!=parent,var(7)&&parent,var(7)!=0
+
+[State 999,Pos]
+type=PosSet
+trigger1=1
+ignorehitpause=1
+x=(parent,pos x)+(-54*TeamSide+81)
+y=(parent,pos y)-78
+
+[State 999, PosFreeze]
+type = PosFreeze
+trigger1 = 1
+value = 1
+
+[State 999, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoAutoTurn
+
+[State 999, 0]
+type = AssertSpecial
+ignorehitpause=1
+trigger1 = 1
+flag = NoStandGuard
+flag2 = NoCrouchGuard
+flag3 = NoAirGuard
+
+[State 899, NotHitBy]
+type = NotHitBy 
+trigger1 = !time
+value = SCA, AA, AP
+time = 100
+ignorehitpause=1
+
+[State 999, HitOver]
+type = NotHitBy
+trigger1= 1
+time = 1
+value= , AT
+ignorehitpause=1
+
+[State 999, HitOver]
+type = HitOverride
+trigger1= 1
+time = -1
+attr = SCA, AA, AP
+stateno = 999
+
+[State 999, LifeAdd]
+type = ParentVarAdd
+trigger1 = Time = 0
+v=4
+value = - floor(gethitvar(damage))
+
+[State 900, Destroy Left Arm]
+type=Changestate
+trigger1=parent,var(4)<0
+value=900
+
+[State 999, ChangeAnim]
+type = ChangeAnim
+trigger1 = Time < floor(gethitvar(hittime) * 0.35)&&var(0)!=920
+value = Anim
+elem = AnimElemNo(0)
+
+[State 999, End]
+type = ChangeState
+trigger1 = Time >= floor(gethitvar(hittime) * 0.35)||var(0)=920
+value = var(0)

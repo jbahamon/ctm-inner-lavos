@@ -1,0 +1,28 @@
+[Info]
+name = "Inner Lavos"             ;Name of character
+displayname = "Inner Lavos"   ;Name of character to display
+versiondate = ;Version date of character
+mugenversion =;Version of M.U.G.E.N character works on
+author = "The Nightcrawler"         ;Character author name
+pal.defaults = 1            ;Default palettes in order of preference
+
+; Files for the player
+[Files]
+cmd     = Lavos.cmd   ;Command set
+cns     = Lavos.cns   ;Constants
+st      = Lavos.cns   ;States
+st1    = Helpers.cns   ;Helpers
+st2    = Left.cns   ;Left Arm
+st3    = Right.cns   ;Right Arm
+st4    = Status.cns ;:D
+stcommon = Override.cns ;Common states
+sprite  = Lavos.sff   ;Sprite
+anim    = Lavos.air   ;Animation
+sound   = Lavos.snd      ;Sound
+pal1    = Lavos.act   ;Palettes (can have up to 12)
+;*** delete lines with palettes you are not using ***
+
+; Arcade mode
+[Arcade]
+intro.storyboard =     ;*** Set to blank for now ***
+ending.storyboard =    ;*** Set to blank for now ***
