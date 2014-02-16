@@ -1,0 +1,1595 @@
+; KFM's.. er, Lavos' constants and state file.
+
+[Data]
+life = 2000
+attack = 100
+defence = 120
+fall.defence_up = 50
+liedown.time = 60
+airjuggle = 15
+sparkno = 2
+guard.sparkno = 40
+KO.echo = 0
+
+;Variables with this index and above will not have their values
+;reset to 0 between rounds or matches. There are 60 int variables,
+;indexed from 0 to 59, and 40 float variables, indexed from 0 to 39.
+;If omitted, then it defaults to 60 and 40 for integer and float
+;variables repectively, meaning that none are persistent, i.e. all
+;are reset. If you want your variables to persist between matches,
+;you need to override state 5900 from common1.cns.
+IntPersistIndex = 58
+FloatPersistIndex = 40
+
+[Size]
+xscale = 1         ;Horizontal scaling factor.
+yscale = 1           ;Vertical scaling factor.
+ground.back = 0   ;Player width (back, ground)
+ground.front = 0    ;Player width (front, ground)
+air.back = 0      ;Player width (back, air)
+air.front = 0       ;Player width (front, air)
+height = 60          ;Height of player (for opponent to jump over)
+attack.dist = 50    ;Default attack distance
+proj.attack.dist = 90 ;Default attack distance for projectiles
+proj.doscale = 0     ;Set to 1 to scale projectiles too
+head.pos = -2, -14   ;Approximate position of head
+mid.pos = -2, -7    ;Approximate position of midsection
+shadowoffset = 0     ;Number of pixels to vertically offset the shadow
+draw.offset = 0,0    ;Player drawing offset in pixels (x, y)
+
+[Velocity]
+walk.fwd  = 0      ;Walk forward
+walk.back = 0     ;Walk backward
+run.fwd  = 0, 0    ;Run forward (x, y)
+run.back = 0,0 ;Hop backward (x, y)
+jump.neu = 0,0    ;Neutral jumping velocity (x, y)
+jump.back = 0    ;Jump back Speed (x, y)
+jump.fwd = 0       ;Jump forward Speed (x, y)
+runjump.back = 0,0 ;Running jump speeds (opt)
+runjump.fwd = 0,0      ;.
+airjump.neu = 0,0      ;.
+airjump.back = 0      ;Air jump speeds (opt)
+airjump.fwd = 0         ;.
+
+[Movement]
+airjump.num = 0     ;Number of air jumps allowed (opt)
+airjump.height = 9999  ;Minimum distance from ground before you can air jump (opt)
+yaccel = 999       ;Vertical acceleration
+stand.friction = 9999  ;Friction coefficient when standing
+crouch.friction = 9999 ;Friction coefficient when crouching
+
+;---------------------------------------------------------------------------
+; Variable usage:
+; This is a record of the variables that KFM uses. Keeping a record of your
+; variable usage helps you avoid careless mistakes later.
+;Var(0): For Position
+;Var(1): Right Arm Dead
+;Var(2): Left Arm Dead
+;Var(3): Right Arm's Life
+;Var(4): Left Arm's Life
+;var(5); Damage :D
+;var(6): Right Arm facing
+;var(7): Left Arm facing
+;var(8): Main Life
+;var(9): Unguardable
+;var(10): TeamMode !=Simul
+;var(11): Chaos
+;var(12): Stop
+;var(13): EnemyID
+;var(14): Poison
+;var(15): AI
+;var(56),(57),(58): Winane's AI Activation Method
+
+;---------------------------------------------------------------------------
+; Lose by Time Over
+; CNS difficulty: basic
+[Statedef 170]
+type = S
+ctrl = 0
+anim = 170
+velset = 0,0
+
+[State 170, 1]
+type = NotHitBy
+trigger1 = 1
+value = SCA
+time = 1
+
+;---------------------------------------------------------------------------
+; Win state decider
+; CNS difficulty: basic
+[Statedef 180]
+type = S
+
+[State 180, 1]
+type = ChangeState
+trigger1 = Time = 0
+value = 181
+
+
+;---------------------------------------------------------------------------
+
+;Intro, 195 ^^U
+[Statedef 190]
+type=S
+ctrl=0
+velset=0,0
+
+[State 190, pos]
+type=PosSet
+trigger1=1
+ignorehitpause=1
+X = 0;
+Y = -52;
+
+[State 190,Play]
+type = AssertSpecial
+trigger1 = 1
+flag = Intro
+
+[State 190,Play]
+type=Playsnd
+trigger1=!time
+value=0,1
+
+[State 190,Play]
+type=Changestate
+trigger1=time=600
+value=0
+ctrl=1
+
+
+;---------------------------------------------------------------------------
+;Main Body:198-199
+
+;198: Body helper
+
+[Statedef 198]
+type=S
+physics=N
+movetype=I
+anim=6
+velset=0,0
+ctrl=0
+sprpriority=-1
+
+[State 198, HitOver]
+type = NotHitBy
+trigger1= 1
+time = 1
+value= , AT
+ignorehitpause=1
+
+[State 198,pos]
+type=posset
+trigger1=1
+X = parent, pos x
+Y = parent, pos y
+
+[State 198, pos]
+type=PosFreeze
+trigger1=1
+ignorehitpause=1
+
+[State 198, 0]
+type = AssertSpecial
+trigger1 = 1
+ignorehitpause=1
+flag = NoAutoTurn
+
+[State 198, VarSet]
+type = VarSet
+trigger1= 1
+var(5) = StateNo
+persistent=0
+
+[State 198, HitOverride]
+type=hitoverride
+trigger1=1
+time=-1
+attr=SCA,AA,AT,AP
+stateno=199
+ignorehitpause=1
+
+;Getting Hit
+[Statedef 199]
+velset=0,0
+MoveType = H
+sprpriority=-1
+
+[State 199,pos]
+type=posset
+trigger1=1
+X = parent, pos x
+Y = parent, pos y
+
+[State 199, 0]
+type = AssertSpecial
+trigger1 = 1
+ignorehitpause=1
+flag = NoAutoTurn
+
+[State 199, 0]
+type = AssertSpecial
+trigger1 = 1
+ignorehitpause=1
+flag = NoStandGuard
+flag2 = NoCrouchGuard
+flag3 = NoAirGuard
+
+[State 199, PosFreeze]
+type = PosFreeze
+trigger1 = 1
+value = 1
+
+[State 199, NotHitBy]
+type = NotHitBy 
+trigger1 = !time
+value = SCA, AA, AP
+time = 30
+
+[State 199, HitOver]
+type = NotHitBy
+trigger1= 1
+time = 1
+value= , AT
+ignorehitpause=1
+
+[State 199, HitOver]
+type = HitOverride
+trigger1= 1
+time = -1
+attr = SCA, AA, AP
+stateno = 199
+
+[State 199, LifeAdd]
+type = ParentVarAdd
+trigger1 = Time = 0
+v=8
+value = ifelse(root,Var(1)&&root,Var(2),-floor(gethitvar(damage)),-floor(3*gethitvar(damage)/4))
+
+[State 199, ChangeAnim]
+type = ChangeAnim
+trigger1 = Time < floor(gethitvar(hittime) * 0.5)
+value = Anim
+elem = AnimElemNo(0)
+
+[State 199, End]
+type = ChangeState
+trigger1 = Time >= floor(gethitvar(hittime) * 0.5)
+value = Var(5)
+
+;---------------------------------------------------------------------------
+
+;Attacks: 200-399
+
+;---Hurricane Right---
+[Statedef 201]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0
+
+[State 201,end]
+type=Changestate
+trigger1= !NumHelper(800)||var(1)||Helper(800),Animtime=0
+value=0
+ctrl=1
+
+;---Protective Seal Right---
+[Statedef 202]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0
+poweradd=-100
+
+[State 202,end]
+type=Changestate
+trigger1= !NumHelper(800)||var(1)||Helper(800),Animtime=0
+value=0
+ctrl=1
+
+[State 202, Helper1]
+type=Helper
+trigger1=(Helper(800),anim=12)&&(Helper(800),animelemtime(9)=15)&&!(Helper(800),var(1))
+name="Protective Seal Generator"
+ID=2009
+pos=-43,-24
+postype=p1
+stateno=2009
+ownpal=1
+persistent=0
+
+[State 202, TextExplod]
+trigger1=!time
+type=explod
+anim=2500
+ID=2500
+ownpal=1
+pos=0,216
+postype=left
+
+sprpriority=4
+removetime=60
+removeongethit=1
+bindtime=-1
+
+[State 202, TextExplod]
+trigger1=time=5
+type=explod
+anim=2510
+ID=2510
+ownpal=1
+pos=8,223
+
+postype=left
+sprpriority=5
+removetime=55
+removeongethit=1
+bindtime=-1
+
+;---Freeze Right---
+[Statedef 204]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0
+poweradd=-1000
+
+[State 204,end]
+type=Changestate
+trigger1= !NumHelper(800)||var(1)||Helper(800),Animtime=0
+value=0
+ctrl=1
+
+[State 204, pause]
+type=superpause
+trigger1=time=5
+time=65
+anim=-1
+sound=-1
+darken=0
+poweradd=0
+persistent=0
+
+[State 204, TextExplod]
+trigger1=!time
+type=explod
+anim=2500
+ID=2500
+ownpal=1
+pos=0,216
+postype=left
+sprpriority=4
+
+removetime=60
+removeongethit=1
+bindtime=-1
+supermovetime=9999
+
+[State 204, TextExplod]
+trigger1=time=5
+type=explod
+anim=2540
+ID=2540
+ownpal=1
+pos=8,223
+postype=left
+
+sprpriority=5
+removetime=55
+removeongethit=1
+bindtime=-1
+supermovetime=9999
+
+[State 204, Helper1]
+type=Helper
+trigger1=(Helper(800),anim=14)&&(Helper(800),animelemtime(4)=15)&&(Helper(800),var(1)=0)
+name="Freeze"
+ID=2040
+pos=floor(enemynear,Screenpos X)+(enemynear,const(size.mid.pos.x)), floor(enemynear,const(size.mid.pos.y))
+postype=left
+stateno=2040
+ownpal=1
+persistent=0
+
+
+
+;---Span Death - Right---
+
+[Statedef 205]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0
+poweradd=-1000
+
+[State 220, Remove]
+trigger1=!time
+type=removeexplod
+ID=2500
+
+[State 220, Remove]
+trigger1=!time
+type=removeexplod
+ID=2501
+
+[State 205,end]
+type=Changestate
+trigger1= !NumHelper(800)||var(1)||Helper(800),Animtime=0
+value=0
+ctrl=1
+
+[State 205, pause]
+type=superpause
+trigger1=time=5
+time=60
+anim=-1
+sound=-1
+darken=0
+poweradd=0
+persistent=0
+
+[State 205, TextExplod]
+trigger1=!time
+type=explod
+anim=2500
+ID=2500
+ownpal=1
+pos=0,216
+postype=left
+sprpriority=4
+removetime=60
+removeongethit=1
+bindtime=-1
+supermovetime=99999
+
+[State 205, TextExplod]
+trigger1=time=5
+type=explod
+anim=2550
+ID=2550
+ownpal=1
+pos=8,223
+postype=left
+sprpriority=5
+removetime=55
+removeongethit=1
+bindtime=-1
+supermovetime=99999
+
+[State 205, Explod]
+trigger1=helper(800),animelemtime(15)=0&&Helper(800),anim=15
+type=explod
+anim=2600
+ID=2600
+ownpal=1
+pos=ifelse(teamside=2,15,-15),-70
+postype=p1
+sprpriority=4
+vel=0,-0.4
+facing=ifelse(teamside=2,-1,1)
+removetime=55
+removeongethit=1
+bindtime=1
+persistent=0
+
+;---Hurricane Left---
+[Statedef 301]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0
+
+[State 301,end]
+type=Changestate
+trigger1=!NumHelper(900)||Helper(900),Animtime=0
+value=0
+ctrl=1
+
+;Protective Seal Left
+[Statedef 302]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0
+poweradd=-100
+
+[State 302,end]
+type=Changestate
+trigger1= !NumHelper(900)||var(2)||Helper(900),Animtime=0
+value=0
+ctrl=1
+
+[State 302, TextExplod]
+trigger1=!time
+type=explod
+anim=2500
+ID=2500
+ownpal=1
+pos=0,216
+
+postype=left
+sprpriority=4
+removetime=60
+removeongethit=1
+bindtime=-1
+
+[State 302, Helper1]
+type=Helper
+trigger1=(Helper(900),anim=1012)&&(Helper(900),animelemtime(9)=15)&&!(Helper(900),var(1))
+name="Generator"
+ID=2009
+pos=43,-24
+postype=p1
+stateno=2009
+ownpal=1
+persistent=0
+
+[State 302, TextExplod]
+trigger1=time=5
+type=explod
+anim=2510
+ID=2510
+ownpal=1
+pos=8,223
+
+postype=left
+sprpriority=5
+removetime=55
+removeongethit=1
+bindtime=-1
+
+
+;---Freeze - Left---
+[Statedef 304]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0
+poweradd=-1000
+
+[State 304,end]
+type=Changestate
+trigger1= !NumHelper(900)||var(2)||Helper(900),Animtime=0
+value=0
+ctrl=1
+
+[State 304, pause]
+type=superpause
+trigger1=time=5
+time=60
+anim=-1
+sound=-1
+darken=0
+poweradd=0
+persistent=0
+
+[State 304, TextExplod]
+trigger1=!time
+type=explod
+anim=2500
+ID=2500
+ownpal=1
+pos=0,216
+postype=left
+
+sprpriority=4
+removetime=60
+removeongethit=1
+bindtime=-1
+supermovetime=99999
+
+[State 304, TextExplod]
+trigger1=time=5
+type=explod
+anim=2540
+ID=2540
+ownpal=1
+pos=8,223
+
+postype=left
+sprpriority=5
+removetime=55
+removeongethit=1
+bindtime=-1
+supermovetime=99999
+
+[State 304, Helper1]
+type=Helper
+trigger1=(Helper(900),anim=1014)&&(Helper(900),animelemtime(4)=15)&&(Helper(900),var(1)=0)
+name="Freeze"
+ID=2040
+pos=floor(enemynear,Screenpos X)+(enemynear,const(size.mid.pos.x)), floor(enemynear,const(size.mid.pos.y))
+postype=left
+stateno=2040
+ownpal=1
+persistent=0
+
+
+;---Span Death - Left---
+
+[Statedef 305]
+type = S
+ctrl = 0
+anim = 0
+velset = 0,0
+poweradd=-1000
+
+[State 305,end]
+type=Changestate
+trigger1= !NumHelper(900)||var(2)||Helper(900),Animtime=0
+value=0
+ctrl=1
+
+[State 220, Remove]
+trigger1=!time
+type=removeexplod
+ID=2500
+
+[State 220, Remove]
+trigger1=!time
+type=removeexplod
+ID=2501
+
+[State 305, pause]
+type=superpause
+trigger1=time=5
+time=60
+anim=-1
+sound=-1
+darken=0
+poweradd=0
+persistent=0
+
+[State 305, TextExplod]
+trigger1=!time
+type=explod
+anim=2500
+ID=2500
+ownpal=1
+pos=0,216
+postype=left
+sprpriority=4
+
+removetime=60
+removeongethit=1
+bindtime=-1
+supermovetime=99999
+
+[State 305, TextExplod]
+trigger1=time=5
+type=explod
+anim=2550
+ID=2550
+ownpal=1
+pos=8,223
+postype=left
+sprpriority=5
+
+removetime=55
+removeongethit=1
+bindtime=-1
+supermovetime=99999
+
+[State 205, Explod]
+trigger1=helper(900),animelemtime(13)=0&&Helper(900),anim=1015
+type=explod
+anim=2600
+ID=2600
+ownpal=1
+pos=ifelse(teamside=2,15,-15),-70
+postype=p1
+facing=ifelse(teamside=2,-1,1)
+sprpriority=4
+vel=0,-0.4
+removetime=55
+removeongethit=1
+bindtime=1
+persistent=0
+
+
+;---Laser beams - Doors of Doom open.---
+
+[Statedef 220]
+type = S
+ctrl = 0
+movetype=A
+anim = 2
+velset = 0,0
+poweradd=-2000
+
+[State 220, bgpalfx]
+type=BgPalFx
+trigger1=Helper(800),Animtime=0||Helper(900),Animtime=0
+trigger3=time>515
+time=0
+
+[State 220,end]
+type=Changestate
+trigger2= !NumHelper(800)||!NumHelper(900)
+trigger1= Helper(800),Animtime=0||Helper(900),Animtime=0
+trigger3=var(1)||var(2)
+value=0
+ctrl=1
+
+[State 220, Remove]
+trigger1=!time
+type=removeexplod
+ID=2500
+
+[State 220, Remove]
+trigger1=!time
+type=removeexplod
+ID=2501
+
+[State 220, TextExplod]
+trigger1=!time
+type=explod
+anim=2500
+ID=2500
+ownpal=1
+pos=0,216
+postype=left
+sprpriority=4
+supermovetime=229
+removetime=229
+removeongethit=0
+bindtime=-1
+
+[State 220, TextExplod]
+trigger1=time=5
+type=explod
+anim=2520
+ID=2501
+ownpal=1
+pos=8,223
+postype=left
+sprpriority=5
+removetime=220
+supermovetime=220
+removeongethit=0
+bindtime=-1
+
+[State 220, pause]
+type=superpause
+trigger1=time=180
+movetime=285
+time=285
+anim=-1
+sound=-1
+darken=0
+poweradd=0
+
+[State 220,Beam1]
+type=helper
+trigger1=time=139
+name="Beamo"
+ID=2020
+pos=17,-42
+postype=p1
+stateno=2020
+ownpal=1
+persistent=0
+supermovetime=286
+
+[State 2020, snd]
+type=PlaySnd
+trigger1=time=120
+volume=255
+channel=0
+value=2,0
+
+[State 220,Beam2]
+type=helper
+trigger1=time=139
+name="Beamo"
+ID=2021
+pos=-17,-42
+facing=-1
+postype=p1
+stateno=2021
+ownpal=1
+persistent=0
+supermovetime=286
+
+[State 220, bgpalfx]
+type=BgPalFx
+trigger1=time=[170,220]
+time=1
+add=(time-170),-(time-170),-(time-170)
+
+[State 220, bgpalfx]
+type=BgPalFx
+trigger1=time = [220,465]
+time=1
+add=50,-50,-50
+
+[State 220, bgpalfx]
+type=BgPalFx
+trigger1=time = [465,515]
+time=1
+add=50-(time-465),-50+(time-465),-50+(time-465)
+
+[State 2020, HitDef]
+type=hitdef
+trigger1=time=[180,400]
+attr=A,NP
+numhits=0
+hitflag=MAF
+guardflag=MA
+animtype=Medium
+damage=0,0
+pausetime=0,3
+guard.sparkno=-1
+sparkno=-1
+hitsound=-1
+p1sprpriority=4
+getpower=0,0
+
+[State 2020, HitDef]
+type=hitdef
+trigger1=time=400
+numhits=0
+attr=A,HP
+hitflag=MAF+
+guardflag=MA
+animtype=Medium
+damage=floor((fvar(5)+1)*(ifelse((var(9)+var(11)+var(12)+var(14))=0,140,170))),15
+pausetime=0,0
+sparkno=-1
+guard.sparkno=-1
+hitsound=-1
+fall=1
+fall.recover=0
+ground.velocity=0,0
+palfx.add=200,200,200
+palfx.mul=256,256,256
+palfx.time=10
+getpower=0,0
+
+[State 2020, HitDef]
+type=ChangeAnim
+trigger1=time=420
+value=0
+
+
+;---Obstacle.---
+[Statedef 230]
+type = S
+movetype=A
+ctrl = 0
+anim = 0
+velset = 0,0
+poweradd=-1000
+
+[State 230, Remove]
+trigger1=!time
+type=removeexplod
+ID=2501
+
+[State 220, Remove]
+trigger1=!time
+type=removeexplod
+ID=2500
+
+[State 230, TextExplod]
+trigger1=!time
+type=explod
+anim=2500
+ID=2500
+ownpal=1
+postype=left
+pos=0,216
+sprpriority=4
+removetime=100
+removeongethit=0
+bindtime=-1
+supermovetime=9999
+
+[State 230, TextExplod]
+trigger1=time=5
+type=explod
+anim=2530
+ID=2501
+ownpal=1
+pos=8,223
+postype=left
+sprpriority=5
+removetime=95
+removeongethit=0
+bindtime=-1
+supermovetime=9999
+
+[State 230,Obstacle]
+type=helper
+trigger1=time=10
+name="Obstacle"
+ID=2030
+pos=0,-5
+postype=p1
+stateno=2030
+ownpal=1
+persistent=0
+
+[State 230, pause]
+type=superpause
+trigger1=time=5
+time=100
+anim=-1
+sound=-1
+darken=0
+poweradd=0
+persistent=0
+
+[State 230, pause]
+type=ChangeState
+trigger1=time>100&&!NumHelper(2030)
+value=0
+ctrl=1
+
+;---Flame Battle---
+
+[Statedef 260]
+type = S
+movetype=A
+ctrl = 0
+anim = 0
+velset = 0,0
+
+[State 260,Flame]
+type=helper
+trigger1=time=10
+name="Flame Battle"
+ID=2060
+pos=0,-50
+postype=p1
+stateno=2060
+ownpal=1
+persistent=0
+
+
+[State 260, pause]
+type=ChangeState
+trigger1=time>120
+value=0
+ctrl=1
+
+;---Shadow Slay---
+
+[Statedef 270]
+type = S
+movetype=A
+ctrl = 0
+anim = 0
+velset = 0,0
+poweradd=-1000
+
+[State 270, Remove]
+trigger1=!time
+type=removeexplod
+ID=2501
+
+[State 220, Remove]
+trigger1=!time
+type=removeexplod
+ID=2500
+
+[State 270, TextExplod]
+trigger1=!time
+type=explod
+anim=2500
+ID=2500
+ownpal=1
+pos=0,216
+postype=left
+sprpriority=4
+removetime=229
+removeongethit=0
+bindtime=-1
+supermovetime=9999
+
+[State 270, TextExplod]
+trigger1=time=5
+type=explod
+anim=2570
+ID=2501
+ownpal=1
+pos=8,223
+postype=left
+sprpriority=5
+removetime=220
+removeongethit=0
+bindtime=-1
+supermovetime=9999
+
+[State 270, pause]
+type=superpause
+trigger1=time=5
+time=100
+anim=-1
+sound=-1
+darken=0
+poweradd=0
+persistent=0
+
+[State 270,Obstacle]
+type=helper
+trigger1=time=75
+name="Shadow Slay"
+ID=2070
+pos=0,0
+postype=p1
+stateno=2070
+ownpal=1
+persistent=0
+
+[State 270, pause]
+type=ChangeState
+trigger1=time>89&&!NumHelper(2070)
+value=0
+ctrl=1
+
+;---Shadow Doom Blaze---
+[Statedef 280]
+type = S
+movetype=A
+ctrl = 0
+anim = 2
+velset = 0,0
+poweradd=-3000
+
+[State 280, Remove]
+trigger1=!time
+type=removeexplod
+ID=2501
+
+[State 280, Remove]
+trigger1=!time
+type=removeexplod
+ID=2500
+
+[State 280, TextExplod]
+trigger1=!time
+type=explod
+anim=2500
+ID=2500
+ownpal=1
+pos=0,216
+postype=left
+sprpriority=4
+removetime=100
+removeongethit=0
+bindtime=-1
+supermovetime=9999
+
+[State 280, TextExplod]
+trigger1=time=5
+type=explod
+anim=2580
+ID=2501
+ownpal=1
+pos=8,223
+postype=left
+sprpriority=5
+removetime=100
+removeongethit=0
+bindtime=-1
+supermovetime=9999
+
+[State 270, pause]
+type=superpause
+trigger1=time=5
+time=100
+anim=-1
+sound=-1
+darken=0
+poweradd=0
+persistent=0
+
+[State 280,Beam1]
+type=helper
+trigger1=time=65
+name="Beamo"
+ID=2080
+pos=0,-85
+postype=p1
+stateno=2080
+ownpal=1
+persistent=0
+supermovetime=999999
+
+[State 270, pause]
+type=null;superpause
+trigger1=time=20
+time=230
+movetime=230
+anim=-1
+sound=-1
+darken=0
+poweradd=0
+persistent=0
+
+[State 2020, HitDef]
+type=null;hitdef
+trigger1=NumHelper(2080)
+attr=A,NP
+numhits=0
+hitflag=MAF
+guardflag=MA
+animtype=Medium
+damage=0,0
+pausetime=0,3
+guard.sparkno=-1
+sparkno=-1
+hitsound=-1
+p1sprpriority=4
+getpower=0,0
+
+[State 290, :D]
+type=ChangeState
+trigger1=time>395
+value=0
+ctrl=1
+
+
+;---Evil Emanation---
+[Statedef 290]
+type = S
+movetype=I
+ctrl = 0
+anim = 0
+velset = 0,0
+poweradd=-100
+
+[State 290, Remove]
+trigger1=!time
+type=removeexplod
+ID=2501
+
+[State 290, Remove]
+trigger1=!time
+type=removeexplod
+ID=2500
+
+[State 290, TextExplod]
+trigger1=!time
+type=explod
+anim=2500
+ID=2500
+ownpal=1
+pos=0,216
+postype=left
+sprpriority=4
+
+removetime=169
+removeongethit=0
+bindtime=-1
+supermovetime=9999
+
+[State 290, TextExplod]
+trigger1=time=5
+type=explod
+anim=2590
+ID=2501
+ownpal=1
+pos=8,223
+postype=left
+
+sprpriority=5
+removetime=160
+removeongethit=0
+bindtime=-1
+supermovetime=9999
+
+[State 290, pause]
+type=superpause
+trigger1=time=5
+time=100
+anim=-1
+sound=-1
+darken=0
+poweradd=0
+persistent=0
+
+[State 290, var]
+type=VarAdd
+trigger1=time=60
+fvar(5)=ifelse(fvar(5)=0.2,0,0.05)
+
+[State 290, :D]
+type=ChangeState
+trigger1=time>69
+value=0
+ctrl=1
+
+;---------------------------------------------------------------------------
+;Freezing position, etc.. =/
+
+[Statedef -2]
+
+[State -2, StopAI]
+type = VarSet
+triggerall = var(58) > 0 && !IsHelper
+trigger1 = RoundState != 2
+trigger2 = !Alive
+var(58) = -2
+IgnoreHitPause = 1
+
+[State -2, Simplifier]
+type = VarSet
+triggerall = !IsHelper
+trigger1 = var(58) = 1
+trigger2 = var(15):=0
+var(15) = 1
+IgnoreHitPause = 1
+
+[State -2, lol]
+type=AssertSpecial
+trigger1=var(9)>0
+ignorehitpause=1
+flag=unguardable
+
+[State -2, lol]
+type=VarAdd
+trigger1=var(9)>0
+ignorehitpause=1
+var(9) = -1
+
+[State -2, Power]
+type=Poweradd
+trigger1=roundstate=2
+value=ifelse(var(1)&&var(2),4,2)
+ignorehitpause=1
+
+[State -2, lol]
+type=VarSet
+trigger1=var(10)
+ignorehitpause=1
+var(13) = enemy,ID
+
+[State -2, lol]
+type=VarSet
+trigger1=var(10)!=1&&!(TeamMode=simul)
+ignorehitpause=1
+var(10) = 1
+
+;Poison
+
+[State -2, :P]
+type=Explod
+trigger1=var(14)>0&&!NumExplod(2090)
+ignorehitpause=1
+anim=2090
+ID=2090
+ownpal=1
+pos=0,(enemy,const(size.head.pos.y))-15
+postype=p2
+sprpriority=5
+removetime=var(14)
+removeongethit=0
+bindtime=-1
+
+[State -2, lol]
+type=VarAdd
+trigger1=var(14)>0
+ignorehitpause=1
+var(14) = -1
+
+[State -2, lol]
+type=removeexplod
+trigger1=NumExplod(2090)&&(var(14)=0)
+ignorehitpause=1
+ID=2090
+
+;Freeze
+
+[State -2, :P]
+type=Explod
+trigger1=var(12)>0&&!NumExplod(2092)
+ignorehitpause=1
+anim=2092
+ID=2092
+ownpal=1
+pos=0,(enemy,const(size.head.pos.y))-15
+postype=p2
+sprpriority=5
+removetime=var(12)
+removeongethit=0
+bindtime=-1
+
+[State -2, lol]
+type=VarAdd
+trigger1=var(12)>0
+ignorehitpause=1
+var(12) = -1
+
+[State -2, lol]
+type=removeexplod
+trigger1=NumExplod(2092)&&(var(12)=0)
+ignorehitpause=1
+ID=2092
+
+;Chaos
+
+[State -2, :P]
+type=Explod
+trigger1=var(11)>0&&!NumExplod(2091)
+ignorehitpause=1
+anim=2091
+ID=2091
+ownpal=1
+pos=0,(enemy,const(size.head.pos.y))-15
+postype=p2
+sprpriority=5
+removetime=var(11)
+removeongethit=0
+bindtime=-1
+
+[State -2, lol]
+type=VarAdd
+trigger1=var(11)>0
+ignorehitpause=1
+var(11) = -1
+
+[State -2, lol]
+type=removeexplod
+trigger1=NumExplod(2091)&&(var(11)=0)
+ignorehitpause=1
+ID=2091
+
+[State -2, lol]
+type=VarSet
+trigger1=(RoundState<2)
+ignorehitpause=1
+var(8) = 0;
+
+[State -2, pos]
+type=PosSet
+trigger1=(RoundState<2)
+ignorehitpause=1
+X = 0;
+Y = -52;
+
+[State -2, pos]
+type=PosSet
+trigger1=(Var(0)=0)&&(RoundState=2)
+ignorehitpause=1
+X = 0;
+Y = -52;
+
+[State -2, pos]
+type=VarSet
+trigger1=(Var(0)=0)&&(RoundState=2)
+ignorehitpause=1
+var(8) = 2000;
+
+[State -2, life]
+type=LifeSet
+trigger1=(RoundState=2)&&var(8)>=0
+value= var(8);
+
+[State -2, life]
+type=LifeSet
+trigger1=(RoundState=2)&&var(8)<0
+value= 0;
+
+;The Hands
+
+[State -2, Create Body]
+type=helper
+trigger1=Alive &&NumHelper(198)=0
+name="Body and Head"
+ID=198
+postype=p1
+pos=0,0
+stateno=198
+ownpal=1
+
+[State -2, Create Right Arm]
+type=varset
+trigger1=!var(1)&&!var(0)
+var(3)=1;1200
+
+[State -2, Create Right Pos]
+type=helper
+trigger1=!var(0)&&NumHelper(69)=0
+name="Right Pos"
+ID=69
+postype=left
+pos=0,0
+stateno=1998
+ownpal=1
+
+[State -2, Create Left Pos]
+type=helper
+trigger1=!var(0)&&NumHelper(69)=1
+name="Left Pos"
+ID=69
+postype=left
+pos=320,0
+stateno=1997
+ownpal=1
+
+[State -2, Create Right Arm]
+type=helper
+trigger1=!var(1)&&NumHelper(800)=0
+name="Right Arm"
+ID=800
+postype=p1
+pos=-25,-79
+stateno=800
+ownpal=1
+
+[State -2, Create Left Arm]
+type=varset
+trigger1=!var(2)&&!var(0)
+var(4)=1;800
+
+[State -2, Create Left Arm]
+type=helper
+trigger1=!var(2)&&NumHelper(900)=0
+name="Left Arm"
+ID=900
+postype=p1
+pos=25,-79
+stateno=900
+ownpal=1
+
+[State -2, pos]
+type=VarSet
+trigger1=(Var(6)=0)&&NumHelper(800)
+ignorehitpause=1
+var(6)=(Helper(800),facing)
+
+[State -2, pos]
+type=VarSet
+trigger1=(Var(7)=0)&&NumHelper(900)
+ignorehitpause=1
+var(7)=(Helper(900),facing)
+
+[State -2, screen]
+type=screenbound
+trigger1=1
+value=0
+movecamera=0,0
+
+[State -2, pos]
+type=VarSet
+trigger1=(RoundState=2)
+ignorehitpause=1
+var(0)=1
+
+[State -2, pos]
+type=ScreenBound
+trigger1=1
+ignorehitpause=1
+value=0
+
+[State -2, pos]
+type=PosFreeze
+trigger1=1
+ignorehitpause=1
+
+[State -2, push]
+type=playerpush
+trigger1=1
+value=0
+
+[State -2, 0]
+type = AssertSpecial
+trigger1 = 1
+ignorehitpause=1
+flag = NoAutoTurn
+
+[State -2, 0]
+type = AssertSpecial
+trigger1 = 1
+ignorehitpause=1
+flag = NoStandGuard
+flag2 = NoCrouchGuard
+flag3 = NoAirGuard
+
+[State -2, 0]
+type = AssertSpecial
+trigger1 = 1
+ignorehitpause=1
+flag = timerfreeze
+
+[State -2, asd]
+type=displaytoclipboard
+trigger1=1
+params=var(9)
+text="Unblock=%d"
+
+[Statedef -3]
+
+[State -3, SetAI]
+type = VarSet
+triggerall = Alive && !IsHelper
+triggerall = IsHomeTeam
+trigger1 = TeamSide = 2
+trigger2 = MatchNo > 1
+var(58) = 1
+
+[State -3, AI Helper - Compatibly Partnered Version]
+type = Helper
+trigger1 = !var(58) && !IsHelper
+trigger1 = !NumHelper(9742)
+trigger1 = Alive && RoundState = 2
+trigger1 = NumPartner
+trigger1 = Partner,SelfAnimExist(9741)
+HelperType = normal
+name = "AI Helper (Simul Version)"
+ID = 9742
+pos = 9999999,99999
+StateNo = 9742
+KeyCtrl = 1
+PauseMoveTime = 2147483647
+SuperMoveTime = 2147483647
+
+[State -3, AI Helper]
+type = Helper
+triggerall = !var(58) && !IsHelper
+triggerall = !NumHelper(9741)
+triggerall = Alive && RoundState = 2
+trigger1 = !NumPartner
+trigger2 = !(Partner,SelfAnimExist(9741))
+HelperType = normal
+name = "AI Helper"
+ID = 9741
+pos = 9999999,99999
+StateNo = 9741
+KeyCtrl = 1
+PauseMoveTime = 2147483647
+SuperMoveTime = 2147483647
+
+[State -3, TurnBackOnAI]
+type = VarSet
+trigger1 = var(58) = -2 && !IsHelper
+trigger1 = Alive && RoundState = 2
+var(58) = 1
+
+[State -3, XOR]
+type = VarSet
+triggerall = var(58)!=1 && !IsHelper
+triggerall = !var(56)
+triggerall = var(57) = GameTime-1
+trigger1 = command = "a" ^^ command = "a2"
+trigger2 = command = "b" ^^ command = "b2"
+trigger3 = command = "c" ^^ command = "c2"
+trigger4 = command = "x" ^^ command = "x2"
+trigger5 = command = "y" ^^ command = "y2"
+trigger6 = command = "z" ^^ command = "z2"
+trigger7 = command = "start" ^^ command = "start2"
+trigger8 = command = "holda" ^^ command = "holda2"
+trigger9 = command = "holdb" ^^ command = "holdb2"
+trigger10 = command = "holdc" ^^ command = "holdc2"
+trigger11 = command = "holdx" ^^ command = "holdx2"
+trigger12 = command = "holdy" ^^ command = "holdy2"
+trigger13 = command = "holdz" ^^ command = "holdz2"
+trigger14 = command = "holdstart" ^^ command = "holdstart2"
+trigger15 = command = "holdfwd" ^^ command = "holdfwd2"
+trigger16 = command = "holdback" ^^ command = "holdback2"
+trigger17 = command = "holdup" ^^ command = "holdup2"
+trigger18 = command = "holddown" ^^ command = "holddown2"
+trigger19 = command = "recovery" ^^ command = "recovery2"
+var(58) = 1
+
+[State -3, fiXOR]
+type = VarAdd
+trigger1 = var(56) > 0 && !IsHelper
+var(56) = -1
+
+[State -3, fuXOR]
+type = VarSet
+trigger1 = var(57) < GameTime-1 && !IsHelper
+var(56) = 31
+IgnoreHitPause = 1
+
+[State -3, GameTimeVar]
+type = VarSet
+trigger1 = !IsHelper
+var(57) = GameTime
+IgnoreHitPause = 1

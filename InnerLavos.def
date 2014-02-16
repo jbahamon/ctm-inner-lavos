@@ -1,0 +1,29 @@
+[Info]
+name = "Inner Lavos"             ;Name of character
+displayname = "Inner Lavos"   ;Name of character to display
+versiondate = 07,22,2013;Version date of character
+mugenversion = 1.0          ;Version of M.U.G.E.N character works on (X.XX)
+author = "SilentProtagonist"         ;Character author name
+pal.defaults = 1,2,3,4,5,6, 7, 8, 9, 10
+localcoord = 320,240        ;Local coordinate space width and height
+
+; Files for the player
+[Files]
+cmd     = InnerLavos.cmd   ;Command set
+cns     = InnerLavos.cns   ;Constants
+stcommon = Override.cns ;Common states
+sprite  = InnerLavos.sff   ;Sprite
+anim    = InnerLavos.air   ;Animation
+sound   = InnerLavos.snd      ;Sound
+st      = InnerLavos.cns   ;States
+st1    = Helpers.cns   ;Helpers
+st2    = Left.cns   ;Left Arm
+st3    = Right.cns   ;Right Arm
+st4    = Status.cns ;:D
+
+;*** delete lines with palettes you are not using ***
+
+; Arcade mode
+[Arcade]
+intro.storyboard =     ;*** Set to blank for now ***
+ending.storyboard =    ;*** Set to blank for now ***

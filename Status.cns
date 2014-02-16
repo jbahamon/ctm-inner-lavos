@@ -1,0 +1,453 @@
+;States for status :P
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+;Chaos
+
+;First, a selector/GetHit Stuff :D
+
+[Statedef 2999]
+movetype=H
+sprpriority = 0
+ctrl=0
+
+[State 2999, 4] ;Are you dead?
+type = SelfState
+trigger1 = Life<=0
+value = 5000
+
+[State 2999, 2]
+type = ChangeState
+trigger1 = enemy,var(11)=0
+value = 3053
+
+[State 2999, 0]
+type = ChangeAnim
+trigger1 = 1
+value = ifelse(statetype=C,5021,5011)
+ignorehitpause=1
+
+[State 2999, LifeAdd]
+type = VelSet
+trigger1 = 1; gethitvar(hittime)>0
+x=0
+y=0
+
+[State 2999, End]
+type = ChangeState
+trigger1 = HitOver
+value = ifelse(statetype=C,3011,ifelse(pos y=0,3000,3050))
+
+;---------------------------------------------------------------------------
+
+;Stand
+[Statedef 3000]
+type = S
+physics = S
+sprpriority = 0
+ctrl=0
+
+[State 3000, 1]
+type = ChangeAnim
+trigger1 = Anim != 0 && Anim != 5
+trigger2 = Anim = 5 && AnimTime = 0 ;Turn anim over
+value = 0
+
+[State 3000, 2]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 3000, 3] ;Stop moving if low velocity or 4 ticks pass
+type = VelSet
+trigger1 = abs(vel x) < 2
+trigger2 = Time = 4
+x = 0
+
+[State 3010, 2]
+type = ChangeState
+trigger1 = command = "holdfwd"||command = "holdback"
+value = 3020
+
+[State 3010, 2]
+type = ChangeState
+trigger1 = command = "holddown"
+value = 3040
+
+[State 3010, 2]
+type = ChangeState
+trigger1 = command = "holdup"
+value = 3010
+
+[State 3010, 2]
+type = ChangeState
+trigger1 = enemy,var(11)=0
+value = 3053
+
+[State 3000, 4] ;Are you dead?
+type = SelfState
+trigger1 = Life<=0
+value = 5000
+
+;---------------------------------------------------------------------------
+
+; Stand to Crouch
+[Statedef 3010]
+type    = C
+physics = C
+ctrl=0
+
+[State 3010, 2]
+type = ChangeState
+trigger1 = enemy,var(11)=0
+value = 3053
+
+[State 3010, 0]
+type = ChangeAnim
+trigger1 = !Time
+value = 10
+
+[State 3010, 1]
+type = VelMul
+trigger1 = Time = 0
+x = .75
+
+[State 3010, 2]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 3011
+
+[State 3010, 4] ;Are you dead?
+type = SelfState
+trigger1 = Life<=0
+value = 5000
+
+;---------------------------------------------------------------------------
+
+;Crouching
+[Statedef 3011]
+type    = C
+physics = C
+sprpriority = 0
+ctrl=0
+
+[State 3010, 2]
+type = ChangeState
+trigger1 = enemy,var(11)=0
+value = 3053
+
+[State 3011, 0]
+type = ChangeAnim
+trigger1 = !time
+value = 11
+
+[State 3011, 1] ;Change from turning animation
+type = ChangeAnim
+trigger1 = Anim = 6 && AnimTime = 0
+value = 11
+
+[State 3010, 2]
+type = ChangeState
+trigger1 = command != "holdup"
+value = 3012
+
+[State 3010, 4] ;Are you dead?
+type = SelfState
+trigger1 = Life<=0
+value = 5000
+
+;---------------------------------------------------------------------------
+
+; Crouch to Stand
+[Statedef 3012]
+type    = S
+physics = S
+ctrl=0
+
+[State 3010, 2]
+type = ChangeState
+trigger1 = enemy,var(11)=0
+value = 3053
+
+[State 3012, 0]
+type = ChangeAnim
+trigger1 = !Time
+value = 12
+
+[State 3012, 1]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 3000
+
+[State 3052, 4] ;Are you dead?
+type = SelfState
+trigger1 = Life<=0
+value = 5000
+
+;---------------------------------------------------------------------------
+
+; Walk
+[Statedef 3020]
+type    = S
+physics = S
+sprpriority = 0
+ctrl=0
+
+[State 3010, 2]
+type = ChangeState
+trigger1 = enemy,var(11)=0
+value = 3053
+
+[State 3020, 1]
+type = VelSet
+trigger1 = command = "holdfwd"
+x = const(velocity.walk.back.x)
+
+[State 3020, 2]
+type = VelSet
+trigger1 = command = "holdback"
+x = const(velocity.walk.fwd.x)
+
+[State 3020, 3]
+type = ChangeAnim
+triggerall = vel x > 0
+trigger1 = Anim != 20 && Anim != 5
+trigger2 = Anim = 5 && AnimTime = 0
+value = 20
+
+[State 3020, 4]
+type = ChangeAnim
+triggerall = vel x < 0
+trigger1 = Anim != 21 && Anim != 5
+trigger2 = Anim = 5 && AnimTime = 0
+value = 21
+
+[State 3010, 2]
+type = ChangeState
+trigger1 = command = "holddown"
+value = 3040
+
+[State 3010, 2]
+type = ChangeState
+trigger1 = command != "holdfwd"&&command != "holdback"
+value = 3000
+
+[State 3010, 4] ;Are you dead?
+type = SelfState
+trigger1 = Life<=0
+value = 5000
+
+;---------------------------------------------------------------------------
+
+;Jump Start
+[Statedef 3040]
+type    = S
+physics = S
+ctrl = 0
+sprpriority = 1
+
+[State 3010, 0]
+type = ChangeAnim
+trigger1 = !Time
+value = 40
+
+[State 3010, 2]
+type = ChangeState
+trigger1 = enemy,var(11)=0
+value = 3053
+
+
+[State 3040, 1]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 3040, 2]
+type = VarSet
+trigger1 = command = "holdback"
+sysvar(1) = 1
+
+[State 3040, 3]
+type = VarSet
+trigger1 = command = "holdfwd"
+sysvar(1) = -1
+
+[State 3040, 4]
+type = VelSet
+trigger1 = AnimTime = 0
+x = ifelse(sysvar(1)=0, const(velocity.jump.neu.x), ifelse(sysvar(1)=1, const(velocity.jump.fwd.x), const(velocity.jump.back.x)))
+y = const(velocity.jump.y)
+
+[State 3040, 6]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 3050
+ctrl = 1
+
+[State 3052, 4] ;Are you dead?
+type = SelfState
+trigger1 = Life<=0
+value = 5000
+
+;---------------------------------------------------------------------------
+
+;Jump Up
+[Statedef 3050]
+type    = A
+physics = N
+ctrl=0
+
+[State 3050, 1]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 3050, floor]
+type=Gravity
+trigger1=1
+
+[State 3010, 2]
+type = ChangeState
+trigger1 = enemy,var(11)=0
+value = 3053
+
+[State 3050, 1]
+type = VarSet
+trigger1 = Time = 0
+sysvar(1) = 0
+
+[State 3050, 2]
+type = ChangeAnim
+trigger1 = Time = 0
+value = ifelse((vel x)=0, 41, ifelse((vel x)>0, 42, 43))
+
+[State 3050, 3]
+type = ChangeAnim
+trigger1 = Vel y > -2
+trigger1 = SelfAnimExist(anim + 3)
+persistent = 0
+value = Anim + 3
+
+[State 3050, floor]
+type=ChangeState
+trigger1=pos y>0
+value=3052
+
+[State 3010, 4] ;Are you dead?
+type = SelfState
+trigger1 = Life<=0
+value = 5000
+
+;---------------------------------------------------------------------------
+
+; Jump Land
+[Statedef 3052]
+type    = S
+physics = S
+ctrl = 0
+
+[State 3010, 0]
+type = ChangeAnim
+trigger1 = !Time
+value = 47
+
+[State 3052, 1]
+type = VelSet
+trigger1 = Time = 0
+y = 0
+
+[State 3052, 2]
+type = PosSet
+trigger1 = Time = 0
+y = 0
+
+[State 3010, 2]
+type = ChangeState
+trigger1 = enemy,var(11)=0
+value = 3053
+
+
+[State 3052, 3]
+type = CtrlSet
+trigger1 = Time = 3
+value = 1
+
+[State 3052, 4]
+type = ChangeState
+trigger1 = AnimTime = 0
+value = 3000
+
+[State 3052, 4] ;Are you dead?
+type = SelfState
+trigger1 = Life<=0
+value = 5000
+
+;---------------------------------------------------------------------------
+;Dizzy, and goodbye!
+
+[Statedef 3053]
+type    = S
+physics = S
+ctrl = 0
+
+[State 3053, d]
+type=NotHitBy
+trigger1=1
+value=SCA,AA,AP,AT
+
+[State 3053, 0]
+type = ChangeAnim
+trigger1 = !time&&pos y=0
+value = ifelse(animexist(5300),5300,5011)
+ignorehitpause=1
+
+[State 3010, 2]
+type = SelfState
+trigger1 = time>=100 || pos y!=0
+value = 5050
+
+
+
+;---------------------------------------------------------------------------
+;---------------------------------------------------------------------------
+
+;Stop
+
+[Statedef 3100]
+ctrl=0
+velset=0,0
+
+[State 3100, :P]
+type=VelSet
+trigger1=1
+x=0
+y=0
+
+[State 3100, 2]
+type = SelfState
+trigger1 = enemy,var(12)=0
+value = 5050
+
+[State 3100, 2]
+type = palfx
+trigger1 = !time
+time=enemy,var(12)
+add=70,70,70
+sinadd=70,70,70,120
+
+[State 3100, LifeAdd]
+type = LifeAdd
+trigger1 = Time = 0
+value = - gethitvar(damage)
+kill=1
+
+[State 3100, 4] ;Are you dead?
+type = SelfState
+trigger1 = Life=0
+value = 5000
+
+[State 3100, :P]
+type=ChangeAnim
+trigger1=1
+value=anim
+elem=animelemno(0)
