@@ -1858,7 +1858,6 @@ hitflag=MAF
 guardflag=MA
 animtype=Medium
 damage=0,0
-hittime=25
 pausetime=0,3
 guard.sparkno=-1
 sparkno=-1
