@@ -109,7 +109,7 @@ value = 181
 
 ;---------------------------------------------------------------------------
 
-;Intro, 195 ^^U
+;Intro
 [Statedef 190]
 type=S
 ctrl=0
@@ -120,7 +120,7 @@ type=PosSet
 trigger1=1
 ignorehitpause=1
 X = 0;
-Y = -52;
+Y = -22;
 
 [State 190,Play]
 type = AssertSpecial
@@ -1350,14 +1350,14 @@ type=PosSet
 trigger1=(RoundState<2)
 ignorehitpause=1
 X = 0;
-Y = -52;
+Y = -22;
 
 [State -2, pos]
 type=PosSet
 trigger1=(Var(0)=0)&&(RoundState=2)
 ignorehitpause=1
 X = 0;
-Y = -52;
+Y = -22;
 
 [State -2, pos]
 type=VarSet
